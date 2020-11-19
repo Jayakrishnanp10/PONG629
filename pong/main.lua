@@ -46,9 +46,16 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
-    if key == 'enter' or key == 'return' then
+    if key == 's' then
         if gamestate=="start" then
             gamestate="play"
+            gamemode="single"
+        end
+    end
+    if key == 'm' then
+        if gamestate=="start" then
+            gamestate="play"
+            gamemode="multi"
         end
     end
 end
@@ -58,17 +65,29 @@ function love.update(dt)
         sounds["start"]:play(true)
     end
     if gamestate=="play" then
-        if love.keyboard.isDown('w') then
-            player1:up(dt)
+        if gamemode=="single" then
+            if love.keyboard.isDown('up') then
+                player1:up(dt)
+            end
+            if love.keyboard.isDown('down') then
+                player1:down(dt)
+            end
+            player2.dy=(ball.y-player2.y)*15
+            player2.y=player2.y+player2.dy*dt
         end
-        if love.keyboard.isDown('s') then
-            player1:down(dt)
-        end
-        if love.keyboard.isDown('up') then
-            player2:up(dt)
-        end
-        if love.keyboard.isDown('down') then
-            player2:down(dt)
+        if gamemode=="multi" then
+            if love.keyboard.isDown('w') then
+                player1:up(dt)
+            end
+            if love.keyboard.isDown('s') then
+                player1:down(dt)
+            end
+            if love.keyboard.isDown('up') then
+                player2:up(dt)
+            end
+            if love.keyboard.isDown('down') then
+                player2:down(dt)
+            end
         end
         if ball:collision(player1) then
             ball.dx=-ball.dx*1.04
@@ -138,7 +157,7 @@ function love.draw()
     if gamestate=="start" then
 
         love.graphics.printf("pong_",0,virtual_height/2-30,virtual_width,'center')
-        love.graphics.printf("press enter to continue",0,virtual_height/2+30,virtual_width,'center')
+        love.graphics.printf("TO START PRESS\nm-multiplayer\ns-singleplayer",0,virtual_height/2+30,virtual_width,'center')
     elseif gamestate=="play" then
         love.graphics.printf("pong_",0,10,virtual_width,'center')
         love.graphics.setColor(0,0,1)
