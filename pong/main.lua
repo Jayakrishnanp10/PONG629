@@ -20,7 +20,8 @@ function love.load()
     love.window.setTitle("pong629")
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.graphics.setBackgroundColor(0,.5,0)
-    font1=love.graphics.newFont("SnesItalic-1G9Be.ttf",20)
+    font1=love.graphics.newFont("BigSpace-rPKx.ttf",20)
+    font2=love.graphics.newFont("BigSpace-rPKx.ttf",15)
     local imagedata = love.image.newImageData("image.png")
     love.window.setIcon(imagedata)
     sounds={
@@ -56,6 +57,16 @@ function love.keypressed(key)
         if gamestate=="start" then
             gamestate="play"
             gamemode="multi"
+        end
+    end
+    if key == 'i' then
+        if gamestate=="start" then
+            gamestate="info"
+        end
+    end
+    if key=='r' then
+        if gamestate=="info" then
+            gamestate="start"
         end
     end
 end
@@ -134,11 +145,21 @@ function love.update(dt)
         end
     end
     if gamestate=="victory1" or gamestate=="victory2" then
-        if love.keyboard.isDown('d') then
+        if love.keyboard.isDown('s') then
             gamestate="play"
+            gamemode="single"
+            player1.score=0
+            player2.score=0
+        elseif love.keyboard.isDown('m') then
+            gamestate="play"
+            gamemode="multi"
             player1.score=0
             player2.score=0
         end
+    end
+    if gamestate=="instructions" then
+        sounds["start"]:play(true)
+        
     end
 end
 
@@ -156,9 +177,14 @@ function love.draw()
     love.graphics.setColor(1,2,1)
     if gamestate=="start" then
 
-        love.graphics.printf("pong_",0,virtual_height/2-30,virtual_width,'center')
-        love.graphics.printf("TO START PRESS\nm-multiplayer\ns-singleplayer",0,virtual_height/2+30,virtual_width,'center')
+        love.graphics.printf("pong629",0,virtual_height/2-30,virtual_width,'center')
+        love.graphics.setFont(font2)
+        love.graphics.printf("TO START PRESS\nm-multiplayer\ns-singleplayer\ni-info\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tjPI0",0,virtual_height/2+10,virtual_width,'center')
+    elseif gamestate=="info" then
+        love.graphics.setFont(font2)
+        love.graphics.printf("INSTRUCTIONS\n\nTo move the left paddle up and down in multiplayer use\nw and s respectively and use up and down arrows to move\nright paddle\n in singleplayer use up and down arrows to move paddle\n\npress r to return",0,30,virtual_width,'center')
     elseif gamestate=="play" then
+        love.graphics.setFont(font1)
         love.graphics.printf("pong_",0,10,virtual_width,'center')
         love.graphics.setColor(0,0,1)
         love.graphics.printf(tostring(player1.score),-100,10,virtual_width,'center')
@@ -171,11 +197,13 @@ function love.draw()
         love.graphics.setColor(1,2,1)
         ball:render()
     elseif gamestate=="victory1" then
+        love.graphics.setFont(font1)
         love.graphics.setColor(0,0,1)
-        love.graphics.printf("player1 has won the game\npress d to play\nesc to quit",virtual_height/2,virtual_height/2,virtual_width/2,'center')
+        love.graphics.printf("player1 has won the game\npress s to play singleplayer\npress m to play multiplayer\nesc to quit",virtual_height/2-30,virtual_height/2,virtual_width/2,'center')
     elseif gamestate=="victory2" then
+        love.graphics.setFont(font1)
         love.graphics.setColor(1,0,0)
-        love.graphics.printf("player2 has won the game\npress d to play\n esc to quit",virtual_height/2,virtual_height/2,virtual_width/2,'center')
+        love.graphics.printf("player2 has won the game\npress s to play singleplayer\npress m to play multiplayer\n esc to quit",virtual_height/2-30,virtual_height/2,virtual_width/2,'center')
     end
     push:finish()
 end
