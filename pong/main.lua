@@ -23,6 +23,13 @@ function love.load()
     font1=love.graphics.newFont("SnesItalic-1G9Be.ttf",20)
     local imagedata = love.image.newImageData("image.png")
     love.window.setIcon(imagedata)
+    sounds={
+    ["start"]=love.audio.newSource("sounds/start.wav","stream"),
+    ["victory"]=love.audio.newSource("sounds/victory.wav","stream"),
+    ["score"]=love.audio.newSource("sounds/score.wav","static"),
+    ["paddlehit"]=love.audio.newSource("sounds/paddlehit.wav","static"),
+    ["wallhit"]=love.audio.newSource("sounds/wallhit.wav","static"),
+    }
     push:setupScreen(virtual_width,virtual_height,window_width,window_height,{
         fullscreen=false,
         resizable=false,
@@ -47,6 +54,9 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+    if gamestate=="start" then
+        sounds["start"]:play(true)
+    end
     if gamestate=="play" then
         if love.keyboard.isDown('w') then
             player1:up(dt)
@@ -63,27 +73,33 @@ function love.update(dt)
         if ball:collision(player1) then
             ball.dx=-ball.dx*1.04
             ball.x=player1.x+5
+            sounds["paddlehit"]:play()
         end
         if ball:collision(player2) then
             ball.dx=-ball.dx*1.04
             ball.x=player2.x-5
+            sounds["paddlehit"]:play()
         end
         if ball.y<0 then
             ball.dy=-ball.dy
             ball.y=5
+            sounds["wallhit"]:play()
         end
         if ball.y+ball.r>virtual_height then
             ball.dy=-ball.dy
             ball.y=virtual_height-5
+            sounds["wallhit"]:play()
         end
         if ball.x<0 then
             player2.score=player2.score+1
+            sounds["score"]:play()
             ball:reset()
             player1:reset()
             player2:reset()
         end
         if ball.x+ball.r>virtual_width then
             player1.score=player1.score+1
+            sounds["score"]:play()
             ball:reset()
             player1:reset()
             player2:reset()
@@ -91,9 +107,11 @@ function love.update(dt)
         ball:update(dt)
         if player2.score==5 then
             gamestate="victory2"
+            sounds["victory"]:play(true)
         end
         if player1.score==5 then
             gamestate="victory1"
+            sounds["victory"]:play(true)
         end
     end
     if gamestate=="victory1" or gamestate=="victory2" then
