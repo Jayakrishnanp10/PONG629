@@ -24,6 +24,8 @@ function love.load()
     font2=love.graphics.newFont("BigSpace-rPKx.ttf",15)
     local imagedata = love.image.newImageData("image.png")
     love.window.setIcon(imagedata)
+    background = love.graphics.newImage("background.png")
+    vic = love.graphics.newImage("vic.png")
     sounds={
     ["start"]=love.audio.newSource("sounds/start.wav","stream"),
     ["victory"]=love.audio.newSource("sounds/victory.wav","stream"),
@@ -32,8 +34,8 @@ function love.load()
     ["wallhit"]=love.audio.newSource("sounds/wallhit.wav","static"),
     }
     push:setupScreen(virtual_width,virtual_height,window_width,window_height,{
-        fullscreen=false,
-        resizable=false,
+        fullscreen=true,
+        resizable=true,
         vsync=true
     })
     ball=ball(virtual_width/2,virtual_height/2,4)
@@ -69,6 +71,9 @@ function love.keypressed(key)
             gamestate="start"
         end
     end
+end
+function love.resize(w,h)
+    push:resize(w,h)
 end
 
 function love.update(dt)
@@ -135,11 +140,11 @@ function love.update(dt)
             player2:reset()
         end
         ball:update(dt)
-        if player2.score==5 then
+        if player2.score==10 then
             gamestate="victory2"
             sounds["victory"]:play(true)
         end
-        if player1.score==5 then
+        if player1.score==10 then
             gamestate="victory1"
             sounds["victory"]:play(true)
         end
@@ -173,11 +178,16 @@ function love.draw()
         love.graphics.setColor(1,1,1,0.5)
     elseif gamestate=="play" then
         love.graphics.setColor(1,1,1,1)
+        for i = 0, love.graphics.getWidth() / background:getWidth() do
+            for j = 0, love.graphics.getHeight() / background:getHeight() do
+                love.graphics.draw(background, i * background:getWidth(), j * background:getHeight())
+            end
+        end
     end
     love.graphics.setColor(1,2,1)
     if gamestate=="start" then
 
-        love.graphics.printf("pong629",0,virtual_height/2-30,virtual_width,'center')
+        love.graphics.printf("P0NG",0,virtual_height/2-30,virtual_width,'center')
         love.graphics.setFont(font2)
         love.graphics.printf("TO START PRESS\nm-multiplayer\ns-singleplayer\ni-info\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tjPI0",0,virtual_height/2+10,virtual_width,'center')
     elseif gamestate=="info" then
@@ -197,11 +207,23 @@ function love.draw()
         love.graphics.setColor(1,2,1)
         ball:render()
     elseif gamestate=="victory1" then
-        love.graphics.setFont(font1)
+        love.graphics.setColor(1,1,1,1)
+        for i = 0, love.graphics.getWidth() / vic:getWidth() do
+            for j = 0, love.graphics.getHeight() / vic:getHeight() do
+                love.graphics.draw(vic, i * vic:getWidth(), j * vic:getHeight())
+            end
+        end
+        love.graphics.setFont(font2)
         love.graphics.setColor(0,0,1)
         love.graphics.printf("player1 has won the game\npress s to play singleplayer\npress m to play multiplayer\nesc to quit",virtual_height/2-30,virtual_height/2,virtual_width/2,'center')
     elseif gamestate=="victory2" then
-        love.graphics.setFont(font1)
+        love.graphics.setColor(1,1,1,1)
+        for i = 0, love.graphics.getWidth() / vic:getWidth() do
+            for j = 0, love.graphics.getHeight() / vic:getHeight() do
+                love.graphics.draw(vic, i * vic:getWidth(), j * vic:getHeight())
+            end
+        end
+        love.graphics.setFont(font2)
         love.graphics.setColor(1,0,0)
         love.graphics.printf("player2 has won the game\npress s to play singleplayer\npress m to play multiplayer\n esc to quit",virtual_height/2-30,virtual_height/2,virtual_width/2,'center')
     end
